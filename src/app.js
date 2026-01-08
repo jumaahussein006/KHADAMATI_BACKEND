@@ -43,8 +43,14 @@ const corsOptions = {
         const isDev = (process.env.NODE_ENV || 'development') !== 'production';
         if (isDev) return callback(null, true);
 
-        // Check if origin is allowed
+        // Check if origin is in allowed list
         if (allowedOrigins.includes(origin)) return callback(null, true);
+
+        // Allow all Vercel preview and production deployments
+        if (origin.endsWith('.vercel.app')) {
+            console.log('CORS ALLOWED - Vercel deployment detected:', origin);
+            return callback(null, true);
+        }
 
         // Log rejection for debugging
         console.error('CORS REJECTED - Origin not in allowed list:', origin);
