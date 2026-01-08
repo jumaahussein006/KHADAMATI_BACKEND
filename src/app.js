@@ -28,13 +28,26 @@ const corsOptions = {
             allowedOrigins.push(process.env.FRONTEND_URL);
             // Also add without trailing slash if present
             allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ''));
+            // Also add with trailing slash if not present
+            if (!process.env.FRONTEND_URL.endsWith('/')) {
+                allowedOrigins.push(process.env.FRONTEND_URL + '/');
+            }
         }
+
+        // Log for debugging (remove in production after fixing)
+        console.log('CORS Check - Origin:', origin);
+        console.log('CORS Check - Allowed Origins:', allowedOrigins);
+        console.log('CORS Check - NODE_ENV:', process.env.NODE_ENV);
 
         // In dev allow all; in prod restrict
         const isDev = (process.env.NODE_ENV || 'development') !== 'production';
         if (isDev) return callback(null, true);
 
+        // Check if origin is allowed
         if (allowedOrigins.includes(origin)) return callback(null, true);
+
+        // Log rejection for debugging
+        console.error('CORS REJECTED - Origin not in allowed list:', origin);
         return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
